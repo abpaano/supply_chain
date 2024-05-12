@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:googlemap_testapp/screens/flutter_map_screens.dart';
 import 'package:googlemap_testapp/screens/login/login_or_register.dart';
+import 'package:googlemap_testapp/screens/seller_login.dart';
+import 'package:http/http.dart' as http;
+
+
+final client = http.Client();
 
 class WelcomeScreen extends StatelessWidget {
   @override
@@ -37,6 +42,14 @@ class WelcomeScreen extends StatelessWidget {
                   'Choose your type of account.',
                   style: TextStyle(fontSize: 18),
                 ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () async {
+                    await callTestSessionRoute();
+                    await callRetrieveSessionRoute();
+                  },
+                  child: Text('Test Sessions'),
+                ),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
@@ -59,7 +72,11 @@ class WelcomeScreen extends StatelessWidget {
                 SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle Seller button press
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SellerLoginScreen()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
@@ -144,5 +161,35 @@ class _DiagonalPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return false;
+  }
+}
+
+Future<void> callTestSessionRoute() async {
+  final baseUrl = 'http://10.0.2.2:8000';
+  final url = Uri.parse('$baseUrl/test-session');
+  try {
+    final response = await client.get(url);
+    if (response.statusCode == 200) {
+      print('Session data set successfully!');
+    } else {
+      print('Error setting session data: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('Error calling test-session route: $error');
+  }
+}
+
+Future<void> callRetrieveSessionRoute() async {
+  final baseUrl = 'http://10.0.2.2:8000';
+  final url = Uri.parse('$baseUrl/retrieve-session');
+  try {
+    final response = await client.get(url);
+    if (response.statusCode == 200) {
+      print(response.body);
+    } else {
+      print('Error retrieving session data: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('Error calling retrieve-session route: $error');
   }
 }

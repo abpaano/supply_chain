@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductRatingController;
 use App\Http\Controllers\StoreRatingController;
 use App\Http\Controllers\ConsumerController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CSRFTokenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,12 +29,12 @@ use App\Http\Controllers\CartController;
 
 
 
-Route::post('/sanctum/token', [AuthController::class, 'login']);
+/*Route::post('/sanctum/token', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/logut', [AuthController::class, 'logout']);
-});
+});*/
 
 Route::get('/search', [ProductController::class, 'search']);
 Route::get('/products', [ProductController::class, 'index']);
@@ -48,6 +49,12 @@ Route::get('/category/{categoryId}/products', [ProductController::class, 'getPro
 Route::get('/products/{id}', [ProductController::class, 'show']); 
 Route::post('/cart/add', [CartController::class, 'addToCart']);
 Route::get('/cart', [CartController::class, 'fetchCart']);
+Route::get('/csrf-token', [CSRFTokenController::class, 'getToken']);
+Route::get('/products', [ProductController::class, 'showMultiple']);
+Route::get('/stores', [StoreController::class, 'showMultiple']); 
+Route::get('/inventory/quantity', [InventoryController::class, 'getQuantities']);
+Route::get('/reviews', [ProductRatingController::class, 'getRatings']);
+
 
 
 //Route::get('students',[StudentController::class, 'index']);

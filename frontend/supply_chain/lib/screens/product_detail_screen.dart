@@ -21,6 +21,7 @@ class ProductDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
     //print(userLocation);
     return FutureBuilder<String>(
         future: fetchDistanceWithBackoff(
@@ -45,6 +46,7 @@ class ProductDetailPage extends StatelessWidget {
                   return Text('Error: ${reviewSnapshot.error}');
                 } else {
                   return Scaffold(
+                    key: _scaffoldKey, // Assign the scaffold key
                     appBar: AppBar(
                       title: Text(product['name']),
                       leading: IconButton(
@@ -80,8 +82,6 @@ class ProductDetailPage extends StatelessWidget {
                                   final prefs =
                                       await SharedPreferences.getInstance();
                                   if (isLiked) {
-                                    // Add product to liked products list
-                                    // You can store liked products IDs in SharedPreferences or any other storage mechanism
                                     final likedProducts =
                                         prefs.getStringList('likedProducts') ??
                                             [];
@@ -379,11 +379,11 @@ class ProductDetailPage extends StatelessWidget {
                           children: [
                             IconButton(
                               onPressed: () {
-                                Navigator.push(
+                                /*Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => CartScreen()),
-                                );
+                                );*/
                               },
                               icon: Icon(
                                 Icons.shopping_cart,
@@ -412,8 +412,17 @@ class ProductDetailPage extends StatelessWidget {
                               width: 16.0,
                             ),
                             ElevatedButton.icon(
-                              onPressed: () {
-                                // Handle "Add to Cart" button tap
+                              onPressed: () async {
+                                // Call the addToCart function
+                                await addToCart(product['id'], 1);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Item added to cart'),
+                                    duration: Duration(
+                                        seconds:
+                                            2), // Adjust duration as needed
+                                  ),
+                                );
                               },
                               icon: Icon(Icons.shopping_cart,
                                   color: Colors.white),
@@ -435,6 +444,41 @@ class ProductDetailPage extends StatelessWidget {
             );
           }
         });
+  }
+}
+
+Future<void> addToCart(int productId, int quantity) async {
+  final csrfToken = await fetchCSRFToken();
+  print("Token: $csrfToken");
+  final uri = Uri.parse('http://10.0.2.2:8000/api/cart/add');
+  final body = jsonEncode({
+    'product_id': productId.toString(),
+    'quantity': quantity.toString()
+  });
+  final response = await http.post(uri, body: body, headers: {
+          'Content-Type': 'application/json',
+          'x-csrf-token': await fetchCSRFToken(),
+        },);
+  final token = await fetchCSRFToken();
+  print("Token: $token");
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    // Handle successful addition to cart
+    print('Item added to cart!');
+  } else {
+    // Handle error
+    print('Failed to add to cart. Status code: ${response.statusCode}');
+  }
+}
+
+Future<String> fetchCSRFToken() async {
+  final response = await http.get(Uri.parse('http://10.0.2.2:8000/api/csrf-token'));
+  if (response.statusCode == 200) {
+    // Extract CSRF token from response headers or body
+    final responseData = json.decode(response.body);
+    print(responseData['csrf_token']);
+    return responseData['csrf_token'];
+  } else {
+    throw Exception('Failed to fetch CSRF token');
   }
 }
 

@@ -57,4 +57,12 @@ class ProductController extends Controller
         $product = Product::findOrFail($id); 
         return response()->json($product); 
     }
+    public function showMultiple(Request $request)
+{
+    $ids = explode(',', $request->input('ids')); // Get IDs from the query string
+
+    $products = Product::whereIn('id', $ids)->get(); 
+
+    return response()->json($products); 
+}
 }

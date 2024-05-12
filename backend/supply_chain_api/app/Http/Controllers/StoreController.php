@@ -22,4 +22,15 @@ class StoreController extends Controller
          $store = Store::findOrFail($storeId); 
          return response()->json($store); 
      }
+     public function showMultiple(Request $request)
+{
+    $storeIds = explode(',', $request->input('ids')); 
+
+    // Fetch stores with products (using eager loading)
+    $stores = Store::whereIn('id', $storeIds)
+                   ->with('products') // Load the associated products
+                   ->get();
+
+    return response()->json($stores); 
+}
 }

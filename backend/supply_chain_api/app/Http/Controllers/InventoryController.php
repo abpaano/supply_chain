@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\Inventory; 
+use Illuminate\Support\Facades\DB; 
 
 class InventoryController extends Controller
 {
@@ -23,4 +24,23 @@ class InventoryController extends Controller
             'quantity' => $inventory->quantity
         ]);
     }
+    public function getQuantities(Request $request): JsonResponse
+{
+    $productIds = explode(',', $request->query('product_ids'));
+
+    // Fetch quantities
+    $quantities = DB::table('inventory') 
+                    ->whereIn('product_id', $productIds)
+                    ->select('product_id', 'quantity')
+                    ->get()
+                    ->keyBy('product_id'); // Create a map keyed by product_id
+
+    // Format response
+    $response = [];
+    foreach ($productIds as $productId) {
+        $response[$productId] = $quantities->get($productId)?->quantity ?? 0; // Handle missing quantities
+    }
+
+    return response()->json($response);
+}
 }

@@ -19,7 +19,7 @@ class _LikeButtonState extends State<LikeButton> {
     return IconButton(
       icon: Icon(
         isLiked ? Icons.favorite : Icons.favorite_border_rounded,
-        color: isLiked ? Colors.red : Colors.white,
+        color: isLiked ? Colors.red : Color(0xFF4ECDC4),
         size: 50,
       ),
       onPressed: () {
