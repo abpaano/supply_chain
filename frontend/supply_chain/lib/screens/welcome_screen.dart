@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:googlemap_testapp/screens/consumer_login.dart';
 import 'package:googlemap_testapp/screens/flutter_map_screens.dart';
 import 'package:googlemap_testapp/screens/login/login_or_register.dart';
 import 'package:googlemap_testapp/screens/seller_login.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:provider/provider.dart';
+import 'package:googlemap_testapp/components/userRoleProvider.dart';
 
 final client = http.Client();
 
@@ -43,20 +45,21 @@ class WelcomeScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 18),
                 ),
                 SizedBox(height: 10),
-                ElevatedButton(
+                /*ElevatedButton(
                   onPressed: () async {
                     await callTestSessionRoute();
                     await callRetrieveSessionRoute();
                   },
                   child: Text('Test Sessions'),
-                ),
+                ),*/
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
+                    Provider.of<UserRoleProvider>(context, listen: false).setRole('consumer');
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => LoginOrRegisterPage()),
+                          builder: (context) => ConsumerLoginScreen()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -72,6 +75,7 @@ class WelcomeScreen extends StatelessWidget {
                 SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
+                    Provider.of<UserRoleProvider>(context, listen: false).setRole('seller');
                     Navigator.push(
                       context,
                       MaterialPageRoute(

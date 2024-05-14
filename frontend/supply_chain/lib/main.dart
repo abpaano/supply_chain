@@ -5,11 +5,15 @@ import 'package:googlemap_testapp/screens/cart_screen.dart';
 import 'package:googlemap_testapp/screens/for_you_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:googlemap_testapp/components/likedProductsProvider.dart';
+import 'package:googlemap_testapp/components/userRoleProvider.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => LikedProductsProvider(),
+    MultiProvider(  // Use MultiProvider for multiple providers
+      providers: [
+        ChangeNotifierProvider(create: (context) => LikedProductsProvider()),
+        ChangeNotifierProvider(create: (context) => UserRoleProvider()),
+      ],
       child: App(),
     ),
   );

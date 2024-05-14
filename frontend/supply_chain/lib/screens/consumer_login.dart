@@ -3,12 +3,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class SellerLoginScreen extends StatefulWidget {
+class ConsumerLoginScreen extends StatefulWidget {
   @override
-  _SellerLoginScreenState createState() => _SellerLoginScreenState();
+  _ConsumerLoginScreenState createState() => _ConsumerLoginScreenState();
 }
 
-class _SellerLoginScreenState extends State<SellerLoginScreen> {
+class _ConsumerLoginScreenState extends State<ConsumerLoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -24,7 +24,7 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
     return Scaffold(
       backgroundColor: Color(0xFFF5F1EB),
       appBar: AppBar(
-        title: Text('Seller Account'),
+        title: Text('Consumer Account'),
         backgroundColor: Color(0xFFF5F1EB),
         foregroundColor: Colors.black,
         leading: IconButton(
@@ -51,7 +51,7 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
                   ),
                   SizedBox(width: 10), // Add spacing
                   Text(
-                    'Manage your own \nonline business',
+                    'Buy and explore in \nthe online market',
                     style: TextStyle(
                         fontSize: 20,
                         color: Colors.grey.shade600,
@@ -117,17 +117,17 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
               SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () async {
-                  final loginResult = await loginSeller(emailController.text, passwordController.text);
+                  final loginResult = await loginConsumer(emailController.text, passwordController.text);
                   if (loginResult != null) {
                     // Login successful!
 
                     // 1. Store token securely using flutter_secure_storage
                     final storage = FlutterSecureStorage();
                     await storage.write(
-                        key: 'seller_auth_token',
+                        key: 'consumer_auth_token',
                         value: loginResult['access_token']);
 
-                    // 2. Navigate to the Seller Dashboard
+                    // 2. Navigate to the Consumer Dashboard
                     Navigator.pushReplacementNamed(
                         context, '/explore');
                   } else {
@@ -198,9 +198,9 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
   }
 }
 
-Future<Map<String, dynamic>?> loginSeller(String email, String password) async {
+Future<Map<String, dynamic>?> loginConsumer(String email, String password) async {
   final baseUrl = 'http://10.0.2.2:8000/api';
-  final loginUrl = Uri.parse('$baseUrl/seller/login'); // Updated login URL
+  final loginUrl = Uri.parse('$baseUrl/consumer/login'); // Updated login URL
   print(jsonEncode({"email": email, "password": password}));
 
   try {

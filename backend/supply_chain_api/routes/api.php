@@ -10,7 +10,8 @@ use App\Http\Controllers\ProductRatingController;
 use App\Http\Controllers\StoreRatingController;
 use App\Http\Controllers\ConsumerController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\CSRFTokenController;
+//use App\Http\Controllers\CSRFTokenController;
+use App\Http\Controllers\Auth\SellerAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,11 +50,13 @@ Route::get('/category/{categoryId}/products', [ProductController::class, 'getPro
 Route::get('/products/{id}', [ProductController::class, 'show']); 
 Route::post('/cart/add', [CartController::class, 'addToCart']);
 Route::get('/cart', [CartController::class, 'fetchCart']);
-Route::get('/csrf-token', [CSRFTokenController::class, 'getToken']);
+//Route::get('/csrf-token', [CSRFTokenController::class, 'getToken']);
 Route::get('/products', [ProductController::class, 'showMultiple']);
 Route::get('/stores', [StoreController::class, 'showMultiple']); 
 Route::get('/inventory/quantity', [InventoryController::class, 'getQuantities']);
 Route::get('/reviews', [ProductRatingController::class, 'getRatings']);
+Route::post('/seller/login', [SellerAuthController::class, 'login'])->name('seller.login');
+Route::post('/consumer/login', [ConsumerController::class, 'login'])->name('consumer.login');
 
 
 

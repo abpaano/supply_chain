@@ -448,8 +448,8 @@ class ProductDetailPage extends StatelessWidget {
 }
 
 Future<void> addToCart(int productId, int quantity) async {
-  final csrfToken = await fetchCSRFToken();
-  print("Token: $csrfToken");
+  /*final csrfToken = await fetchCSRFToken();
+  print("Token: $csrfToken");*/
   final uri = Uri.parse('http://10.0.2.2:8000/api/cart/add');
   final body = jsonEncode({
     'product_id': productId.toString(),
@@ -457,10 +457,10 @@ Future<void> addToCart(int productId, int quantity) async {
   });
   final response = await http.post(uri, body: body, headers: {
           'Content-Type': 'application/json',
-          'x-csrf-token': await fetchCSRFToken(),
+          /*'x-csrf-token': await fetchCSRFToken(),*/
         },);
-  final token = await fetchCSRFToken();
-  print("Token: $token");
+  /*final token = await fetchCSRFToken();
+  print("Token: $token");*/
   if (response.statusCode == 200 || response.statusCode == 201) {
     // Handle successful addition to cart
     print('Item added to cart!');
@@ -470,7 +470,7 @@ Future<void> addToCart(int productId, int quantity) async {
   }
 }
 
-Future<String> fetchCSRFToken() async {
+/*Future<String> fetchCSRFToken() async {
   final response = await http.get(Uri.parse('http://10.0.2.2:8000/api/csrf-token'));
   if (response.statusCode == 200) {
     // Extract CSRF token from response headers or body
@@ -480,7 +480,7 @@ Future<String> fetchCSRFToken() async {
   } else {
     throw Exception('Failed to fetch CSRF token');
   }
-}
+}*/
 
 Future<dynamic> getCategoryIdByProductId(dynamic productId) async {
   final baseUrl = 'http://10.0.2.2:8000/api';

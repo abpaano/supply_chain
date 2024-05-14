@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Review;
 use App\Models\Consumer; 
+use Illuminate\Validation\ValidationException;
 
 class ConsumerController extends Controller
 {
@@ -25,5 +26,30 @@ class ConsumerController extends Controller
         }
 
         return response()->json($consumer, 200);
+    }
+
+    public function login(Request $request)
+    {
+        // 1. Validate credentials
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        // 2. Find Seller
+        $consumer = Consumer::where('email', $request->email)->first();
+        if (!$consumer || $consumer->password !== $request->password) {  
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
+        }
+
+        $token = $consumer->createToken('consumer_auth_token')->plainTextToken;
+
+        return response()->json([
+            'consumer' => $consumer,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
     }
 }
