@@ -117,7 +117,8 @@ class _ConsumerLoginScreenState extends State<ConsumerLoginScreen> {
               SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () async {
-                  final loginResult = await loginConsumer(emailController.text, passwordController.text);
+                  final loginResult = await loginConsumer(
+                      emailController.text, passwordController.text);
                   if (loginResult != null) {
                     // Login successful!
 
@@ -128,8 +129,7 @@ class _ConsumerLoginScreenState extends State<ConsumerLoginScreen> {
                         value: loginResult['access_token']);
 
                     // 2. Navigate to the Consumer Dashboard
-                    Navigator.pushReplacementNamed(
-                        context, '/explore');
+                    Navigator.pushReplacementNamed(context, '/explore');
                   } else {
                     // Login failed. Handle error display.
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -198,10 +198,10 @@ class _ConsumerLoginScreenState extends State<ConsumerLoginScreen> {
   }
 }
 
-Future<Map<String, dynamic>?> loginConsumer(String email, String password) async {
+Future<Map<String, dynamic>?> loginConsumer(
+    String email, String password) async {
   final baseUrl = 'http://10.0.2.2:8000/api';
-  final loginUrl = Uri.parse('$baseUrl/consumer/login'); // Updated login URL
-  print(jsonEncode({"email": email, "password": password}));
+  final loginUrl = Uri.parse('$baseUrl/consumer/login');
 
   try {
     final response = await http.post(
@@ -211,7 +211,17 @@ Future<Map<String, dynamic>?> loginConsumer(String email, String password) async
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
+      final responseData = jsonDecode(response.body);
+      final accessToken = responseData['access_token'];
+      final userId = responseData['consumer']['id']; // Extract user ID
+      print("User ID: $userId");
+
+      // Store access token and user ID securely
+      final storage = FlutterSecureStorage();
+      await storage.write(key: 'access_token', value: accessToken);
+      await storage.write(key: 'user_id', value: userId.toString());
+
+      return responseData as Map<String, dynamic>;
     } else {
       throw Exception('Failed to login, status: ${response.statusCode}');
     }

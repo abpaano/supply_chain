@@ -10,6 +10,7 @@ import 'package:googlemap_testapp/screens/store_screen.dart';
 import 'package:googlemap_testapp/components/like.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final dynamic product;
@@ -379,11 +380,11 @@ class ProductDetailPage extends StatelessWidget {
                           children: [
                             IconButton(
                               onPressed: () {
-                                /*Navigator.push(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => CartScreen()),
-                                );*/
+                                );
                               },
                               icon: Icon(
                                 Icons.shopping_cart,
@@ -413,16 +414,30 @@ class ProductDetailPage extends StatelessWidget {
                             ),
                             ElevatedButton.icon(
                               onPressed: () async {
-                                // Call the addToCart function
-                                await addToCart(product['id'], 1);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Item added to cart'),
-                                    duration: Duration(
-                                        seconds:
-                                            2), // Adjust duration as needed
-                                  ),
-                                );
+                                final storage = FlutterSecureStorage();
+                                final accessToken = await storage.read(key: 'access_token');
+                                final userId = await storage.read(key: 'user_id');
+                                // Call the addToCart function with access token
+                                if (accessToken != null && userId != null) {
+                                  // Call the addToCart function with access token
+                                  await addToCart(userId, product['id'], 1, accessToken);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Item added to cart'),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                } else {
+                                  // Handle case when access token is null
+                                  print('Access token is null');
+                                  await addToCart('null', product['id'], 1, 'null');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Item added to cart'),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
                               },
                               icon: Icon(Icons.shopping_cart,
                                   color: Colors.white),
@@ -447,20 +462,20 @@ class ProductDetailPage extends StatelessWidget {
   }
 }
 
-Future<void> addToCart(int productId, int quantity) async {
-  /*final csrfToken = await fetchCSRFToken();
-  print("Token: $csrfToken");*/
+Future<void> addToCart(String userId, int productId, int quantity, String accessToken) async {
   final uri = Uri.parse('http://10.0.2.2:8000/api/cart/add');
-  final body = jsonEncode({
-    'product_id': productId.toString(),
-    'quantity': quantity.toString()
-  });
-  final response = await http.post(uri, body: body, headers: {
-          'Content-Type': 'application/json',
-          /*'x-csrf-token': await fetchCSRFToken(),*/
-        },);
-  /*final token = await fetchCSRFToken();
-  print("Token: $token");*/
+  final body = jsonEncode(
+      {'user_id': userId, 'product_id': productId.toString(), 'quantity': quantity.toString()});
+  print(body);
+  final response = await http.post(
+    uri,
+    body: body,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken', // Include access token here
+    },
+  );
+
   if (response.statusCode == 200 || response.statusCode == 201) {
     // Handle successful addition to cart
     print('Item added to cart!');
