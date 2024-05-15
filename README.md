@@ -19,3 +19,4 @@
 - Jane Carla Barcoma
 - Angel May Dalawampu
 - Azzedine Usman
+- Alexandrea B. Paaño
