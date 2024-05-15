@@ -44,11 +44,14 @@ class ConsumerController extends Controller
             ]);
         }
 
-        $token = $consumer->createToken('consumer_auth_token')->plainTextToken;
+        //$token = $consumer->createToken('consumer_auth_token')->plainTextToken;
+
+        $consumer->tokens()->where('name', 'auth_token')->delete(); // Remove previous tokens
+        $accessToken = $consumer->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'consumer' => $consumer,
-            'access_token' => $token,
+            'access_token' => $accessToken,
             'token_type' => 'Bearer',
         ]);
     }

@@ -17,7 +17,7 @@ class CreateCartsTable extends Migration
             $table->timestamps();
 
             // Foreign key constraints (optional, but recommended)
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('consumers');
             $table->foreign('product_id')->references('id')->on('products'); 
         });
     }

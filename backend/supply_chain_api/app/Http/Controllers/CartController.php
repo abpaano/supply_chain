@@ -15,14 +15,15 @@ class CartController extends Controller
     // 1. Input Validation (handled by AddToCartRequest)
 
     // 2. Retrieve appropriate user or create a session identifier
-    $user = $request->user(); // Assuming authentication is in place
-    if (!$user) {
+    //$user = $request->user(); // Assuming authentication is in place
+    $userId = $request->user_id;
+    if (!$userId) {
         // Handle guest cart logic
         $sessionId = $request->session()->getId(); // Or generate something unique
     }
 
     // 3. Check if the product already exists in the cart
-    $existingCart = Cart::where('user_id', $user ? $user->id : null)
+    $existingCart = Cart::where('user_id', $userId ? $userId : null)
                         ->where('session_id', $sessionId ?? null)
                         ->where('product_id', $request->product_id)
                         ->first();
@@ -35,7 +36,7 @@ class CartController extends Controller
     } else {
         // Otherwise, create a new cart item
         $cart = Cart::create([
-            'user_id' => $user ? $user->id : null,
+            'user_id' => $userId ? $userId : null,
             'session_id' => $sessionId ?? null,
             'product_id' => $request->product_id,
             'quantity' => $request->quantity
@@ -48,21 +49,20 @@ class CartController extends Controller
     ], Response::HTTP_CREATED); 
 }
 
-    public function fetchCart(Request $request)
-{
-    $user = $request->user(); 
-    $sessionId = $request->session()->getId(); // Get session ID
+    public function fetchCart(Request $request, $id)
+    {
+        //$sessionId = $request->session()->getId(); // Get session ID
 
-    $cart = Cart::where(function ($query) use ($user, $sessionId) {
-        if ($user) {
-            $query->where('user_id', $user->id);
+        if (is_numeric($id)) {
+            // If numeric, assume it's a user ID
+            $cart = Cart::where('user_id', $id)->get();
         } else {
-            $query->where('session_id', $sessionId);
+            // Otherwise, assume it's a session ID
+            $cart = Cart::where('session_id', $id)->get();
         }
-    })->get(); 
 
-    // ... Format the data as needed ...
+        // ... Format the data as needed ...
 
-    return response()->json($cart);
-}
+        return response()->json($cart);
+    }
 }

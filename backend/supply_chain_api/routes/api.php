@@ -37,6 +37,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/logut', [AuthController::class, 'logout']);
 });*/
 
+Route::middleware('auth:sanctum')->group(function () {
+    // Protected routes requiring authentication
+    Route::post('/cart/add', [CartController::class, 'addToCart']);
+    Route::get('/cart/{id}', [CartController::class, 'fetchCart']);
+    // Other authenticated routes...
+});
+
 Route::get('/search', [ProductController::class, 'search']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/stores/{storeId}/products', [StoreController::class, 'getProductsByStore']);
@@ -55,9 +62,9 @@ Route::get('/products', [ProductController::class, 'showMultiple']);
 Route::get('/stores', [StoreController::class, 'showMultiple']); 
 Route::get('/inventory/quantity', [InventoryController::class, 'getQuantities']);
 Route::get('/reviews', [ProductRatingController::class, 'getRatings']);
-Route::post('/seller/login', [SellerAuthController::class, 'login'])->name('seller.login');
-Route::post('/consumer/login', [ConsumerController::class, 'login'])->name('consumer.login');
-
+Route::post('/seller/login', [SellerAuthController::class, 'login']);
+Route::post('/consumer/login', [ConsumerController::class, 'login']);
+Route::get('/cart/{id}', [CartController::class, 'fetchCart']);
 
 
 //Route::get('students',[StudentController::class, 'index']);
